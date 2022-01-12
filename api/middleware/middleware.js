@@ -2,13 +2,14 @@ const Posts = require('../posts/posts-model')
 const Users = require('../users/users-model')
 
 function logger(req, res, next) {
-  // DO YOUR MAGIC
+  console.log('Method: ', req.method, '|URL: ', req.url, '|Timestamp: ', Date.now());
+  next();
 }
 
 async function validateUserId(req, res, next) {
-  const userId = await Users.findById(req.params.id)
-  if(userId){
-    req.user = userId
+  const user = await Users.getById(req.params.id)
+  if(user){
+    req.user = user
     next()
   } else {
     next({ status: 404, message: "user not found" })
