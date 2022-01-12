@@ -42,20 +42,21 @@ router.post('/', logger, validateUser, async (req, res, next) => {
 router.put('/:id', logger, validateUserId,  validateUser, async (req, res, next) => {
   try{
    const updatedUser = await Users.update(req.user.id, req.body)
-   console.log("She shoots, she: ", updatedUser)
-   res.status(200).json({ message: "You did something there"})
+   req.body.name === req.user.name ? next({ status: 400, message: "There is nothing to change" }) : res.status(200).json(updatedUser)
   }
   catch(err){
-    console.log("ID: ", req.user.id, "name: ", req.user.name, "or", req.body)
     next(err)
   }
-  // RETURN THE FRESHLY UPDATED USER OBJECT
-  // and another middleware to check that the request body is valid
 });
 
-router.delete('/:id', logger, validateUserId, (req, res) => {
-  // RETURN THE FRESHLY DELETED USER OBJECT
-  // this needs a middleware to verify user id
+router.delete('/:id', logger, validateUserId, async (req, res) => {
+  try{
+    await Users.remove(req.user.id)
+    res.status(200).json(req.user)
+  }
+  catch(err){
+    next(err)
+  }
 });
 
 router.get('/:id/posts', logger, validateUserId, validatePost, (req, res) => {
